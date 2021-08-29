@@ -11,71 +11,48 @@ Process, Priority,, High
 
 ; ################ VARIABLES ################
 
-global Button1
-global Button2
+global ButtonOne
+global ButtonTwo
 
-global active := true
-
-global debounce := true
-
-
-
-Suspend,On
+global HotkeysEnabled := 0
 
 
 
 ; ################ GUI ################
 
-Gui, Main:New, +AlwaysOnTop -Theme -Border
+Gui, Main:New, +AlwaysOnTop -Theme -Border -ToolWindow
 Gui, Main:Color, Black
 
 Gui, Main:Font, s12, Arial
 
 Gui, Main:Add, Text, cYellow, Mouse Button 1
-Gui, Main:Add, Hotkey, gsubmitInput vButton1
+Gui, Main:Add, Hotkey, gSubmitInput vButtonOne
 
 Gui, Main:Add, Text, cYellow, Mouse Button 2
-Gui, Main:Add, Hotkey, gsubmitInput vButton2
+Gui, Main:Add, Hotkey, gSubmitInput vButtonTwo
 
-Gui, Main:Add, Checkbox, cPurple vactive gsubmitInput, Enabled?
+Gui, Main:Add, Checkbox, cPurple vHotkeysEnabled gSubmitInput, Enabled?
 
 Gui, Main:Font, s8, Arial
 
 Gui, Main:Show, x0 y0 w210 h160, Mouse Hotkeys
 
+SubmitInput()
+
 
 
 ; ################ HOTKEYS ################
 
-XButton1::
-if (active) {
-	SendInput, %Button1%
-} else {
-	return
-} return
-
-XButton2::
-if (active) {
-	SendInput, %Button2%
-} else {
-	return
-} return
+$XButton1::SendInput, % (HotkeysEnabled) ? (ButtonOne) : (XButton1)
+$XButton2::SendInput, % (HotkeysEnabled) ? (ButtonTwo) : (XButton2)
 
 F12::
-Suspend,Permit
-
-if (debounce = true) {
-	Gui, Main:Hide
-	
-	debounce := false
-} else if (debounce = false) {
-	Gui, Main:Show, x0 y0 w210 h160, Mouse Hotkeys
-	
-	debounce := true
-} return
+Suspend, Permit
+Gui, % (GuiActive := !GuiActive) ? ("Main:Hide") : ("Main:Show")
+return
 
 #X::
-Suspend
+Suspend, Permit
 ExitApp
 return
 
@@ -83,13 +60,6 @@ return
 
 ; ################ FUNCTIONS ################
 
-submitInput() {
+SubmitInput() {
 	Gui, Main:Submit, NoHide
-	
-	if (active = true) {		
-		Suspend,Off
-	} else if (active = false) {
-		Suspend,On
-	}
 } return
-
